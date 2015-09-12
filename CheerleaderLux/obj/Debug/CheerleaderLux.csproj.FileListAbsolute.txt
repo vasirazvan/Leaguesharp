@@ -1,0 +1,12 @@
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\CheerleaderLux.exe.config
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\CheerleaderLux.exe
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\CheerleaderLux.pdb
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\clipper_library.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\LeagueSharp.Common.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\LeagueSharp.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\SharpDX.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\SPrediction.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\bin\Release\LeagueSharp.Sandbox.dll
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\obj\Debug\CheerleaderLux.exe
+C:\Users\DJKle\Documents\Visual Studio 2015\Projects\CheerleaderLux\CheerleaderLux\obj\Debug\CheerleaderLux.pdb
