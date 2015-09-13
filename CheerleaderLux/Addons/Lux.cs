@@ -10,10 +10,8 @@ using SharpDX;
 namespace CheerleaderLux.Addons
 {
     // Todo List: - Combo is le finished
-    // - Drawings (spells, damage, objects etc)
     // - Ignite, Ludens, Lichbane Calcs
     // - Laneclear
-    // - Harass
     // - Killsteal
     // - Misc (anti-gap, anti-rengar, anti-khazix etc)
     public class Lux : Extensions.Statics
@@ -59,7 +57,10 @@ namespace CheerleaderLux.Addons
 
             //Harras Menu
             var Harass = combo.AddSubMenu(new Menu("Harass Settings", "harras").SetFontStyle(System.Drawing.FontStyle.Bold));
-
+            Harass.AddItem(new MenuItem("harass.support", "Disable Autoattack").SetValue(false));
+            Harass.AddItem(new MenuItem("harass.mana.slider", "Enemy Count").SetValue(new Slider(3, 5, 1)));
+            Harass.AddItem(new MenuItem("harass.Q", "Use [Q] in Harass").SetValue(true));
+            Harass.AddItem(new MenuItem("harass.E", "Use [E] in Harass").SetValue(true));
             //AutoSpells
             var autospells = combo.AddSubMenu(new Menu("Auto Spell Settings", "ASS").SetFontStyle(System.Drawing.FontStyle.Bold));
             autospells.AddItem(new MenuItem("autospells.E.aoe", "Use [E] on X amount of Enemies").SetValue(true));
@@ -85,10 +86,20 @@ namespace CheerleaderLux.Addons
             Game.OnUpdate += OrbwalkerModes;
             Game.OnUpdate += RefreshObjects;
             Game.OnUpdate += AutoSpells;
+            Orbwalking.BeforeAttack += SupportMode;
             GameObject.OnCreate += EisGone;
             GameObject.OnCreate += EisAlive;
             Obj_AI_Base.OnProcessSpellCast += Tickcount;
             Drawing.OnDraw += Drawings;
+        }
+
+        private static void SupportMode(Orbwalking.BeforeAttackEventArgs args)
+        {
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && Config.Item("harass.support").GetValue<bool>())
+            {
+                if (((Obj_AI_Base)Orbwalker.GetTarget()).IsMinion) args.Process = false;
+            }
+
         }
 
         private static void AutoSpells(EventArgs args)
