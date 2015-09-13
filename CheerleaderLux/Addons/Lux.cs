@@ -10,7 +10,7 @@ using SharpDX;
 namespace CheerleaderLux.Addons
 {
     // Todo List: - Combo is le finished
-    // - Ignite, Ludens, Lichbane Calcs
+    // - Ludens, Lichbane Calcs
     // - Laneclear
     // - Killsteal
     // - Misc (anti-gap, anti-rengar, anti-khazix etc)
@@ -19,7 +19,7 @@ namespace CheerleaderLux.Addons
         public static void OnLoad(EventArgs args)
         {
             Printmsg("Sucessfully loaded - Patch: " + Game.Version);
-            Printmsg("Assembly Version: 1.0.0.1 Beta");
+            Printmsg("Assembly Version: 1.0.0.2 Beta");
 
             Q = new Spell(SpellSlot.Q, 1300);
             W = new Spell(SpellSlot.W, 1075);
@@ -28,7 +28,7 @@ namespace CheerleaderLux.Addons
 
             Q.SetSkillshot(0.25f, 70f, 1200f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 110f, 1200f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 300f, 1300f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 275f, 1300f, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(1f, 190f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             #region Menu
@@ -336,9 +336,11 @@ namespace CheerleaderLux.Addons
         }
         public static void Routine()
         {
+            var targetR = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (target == null || !target.IsValid) return;
+            if (target == null || !target.IsValid || targetR == null || !targetR.IsValid) return;
 
+            Ignite = player.GetSpellSlot("summonerdot");
 
             float qdmg = Q.GetDamage(target);
             float edmg = E.GetDamage(target);
@@ -360,6 +362,9 @@ namespace CheerleaderLux.Addons
             if (insideE && thp < edmg && target.IsValidTarget(R.Range))
                 return;
 
+            if (rooted && insideE && rdmg + edmg > thp && target.IsValidTarget(R.Range))
+                SpellCastR(targetR);
+
             if (thp < aa && target.IsValidTarget(AArange))
                 return;
 
@@ -373,16 +378,55 @@ namespace CheerleaderLux.Addons
             if (Config.Item("combo.E").GetValue<bool>() && Environment.TickCount - Q.LastCastAttemptT > 800 && Environment.TickCount - R.LastCastAttemptT > 800)
                 SpellCast(target, E.Range, E, false, 1, true, HitChance.Medium);
 
-            if (Config.Item("combo.R").GetValue<bool>() && R.IsReady())
-                SpellCastR(target);
-                
+            if (IgniteKillCheck() < thp && target.HasBuff("summonerdot"))
+                return;
 
+            if (Config.Item("combo.R").GetValue<bool>() && R.IsReady())
+                SpellCastR(targetR);
+
+            if (thp > IgniteDamage(target) && thp < IgniteDamage(target) + edmg + aa && rooted && E.IsReady() && target.IsValidTarget(600) && Ignite.IsReady())
+            {
+                player.Spellbook.CastSpell(Ignite, target);
+                Printchat("Ignite casted");
+            }
+
+
+            if (thp < IgniteDamage(target) + rdmg + aa && rooted && Ignite.IsReady())
+            {
+                player.Spellbook.CastSpell(Ignite, target);
+                Printchat("Ignite casted");
+            }
+
+            if (thp < IgniteDamage(target) && target.IsValidTarget(600) && AllyCheck(target, 600) < 1 && Ignite.IsReady())
+            {
+                player.Spellbook.CastSpell(Ignite, target);
+                Printchat("Ignite casted");
+            }
+        }
+
+        private static float IgniteKillCheck() //Credits to Justy ~ Note to self: don't forget to give credits.
+        {
+
+            var igniteBuff =
+                player.Buffs.Where(buff => buff.Name == "summonerdot")
+                    .OrderBy(buff => buff.StartTime)
+                    .FirstOrDefault();
+            if (igniteBuff == null)
+            {
+                return 0;
+            }
+            else
+            {
+                var igniteDamage = Math.Floor(igniteBuff.EndTime - Game.ClockTime) *
+                player.GetSummonerSpellDamage(Attackers[0], Damage.SummonerSpell.Ignite) / 5;
+                return (float)igniteDamage;
+            }
         }
         public static float AllyCheck(Obj_AI_Hero target, int range)
         {
             var allies = 
                 ObjectManager.Get<Obj_AI_Hero>().Where(a => a.IsAlly 
-                && a.Distance(target.Position) < range && a.HealthPercentage() > 20).ToList();
+                && a.Distance(target.Position) < range && a.HealthPercentage() > 20 && !a.IsMe).ToList();
 
             return allies.Count;
             
@@ -404,6 +448,7 @@ namespace CheerleaderLux.Addons
             double edmg = E.GetDamage(target);
             double rdmg = R.GetDamage(target);
             double aa = Player.GetAutoAttackDamage(target);
+            Ignite = player.GetSpellSlot("summonerdot");
             var insideE = Lux_E != null && target.Distance(Lux_E.Position) < E.Width;
             var thp = target.Health;
             var AArange = Orbwalking.GetRealAutoAttackRange(player);
@@ -426,12 +471,15 @@ namespace CheerleaderLux.Addons
                 return;
 
             //Checks if Allies can kill the bitch
-            if (AllyCheck(target, 800) >= 2 && target.Health < rdmg / 2)
+            if (AllyCheck(target, 600) >= 2 && target.Health < rdmg / 2)
                 return;
             //Checks if an Ally can kill le bitch
-            if (AllyCheck(target, 800) >= 1 && target.Health < rdmg / 2)
+            if (AllyCheck(target, 600) >= 1 && target.Health < rdmg / 2)
                 return;
             // = 
+
+            if (rooted && insideE && rdmg > thp && target.IsValidTarget(R.Range))
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.Medium);
 
             if (E.IsReady() && thp < edmg && target.IsValidTarget(E.Range))
                 return;
@@ -462,22 +510,22 @@ namespace CheerleaderLux.Addons
 
             if (rooted && insideE && thp < rdmg + edmg && target.IsValidTarget(R.Range))
             {
-                SpellCast(target, R.Range, R, false, 1, false, HitChance.High);
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.Medium);
             }
 
             if (rooted && debuff && thp < rdmg + aa && target.IsValidTarget(AArange))
             {
-                SpellCast(target, R.Range, R, false, 1, false, HitChance.High);
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.Medium);
             }
 
             if (rooted && debuff && thp < rdmg && target.IsValidTarget(R.Range))
             {
-                SpellCast(target, R.Range, R, false, 1, false, HitChance.High);
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.Medium);
             }
 
             if (thp < rdmg)
             {
-                SpellCast(target, R.Range, R, false, 1, false, HitChance.High);
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.Medium);
             }         
         }
     }
