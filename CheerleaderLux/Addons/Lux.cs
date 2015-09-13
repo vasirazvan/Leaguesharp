@@ -202,6 +202,7 @@ namespace CheerleaderLux.Addons
                     Routine();
                     break;
                 case Orbwalking.OrbwalkingMode.Mixed:
+                    HarassRoutine();
                     break;
                 case Orbwalking.OrbwalkingMode.LaneClear:
                     break;
@@ -303,6 +304,24 @@ namespace CheerleaderLux.Addons
             {
                 spellslot.SPredictionCast(target, Hitchance, 0, count);
             }
+        }
+        public static void HarassRoutine() //Add only use Q on CC
+        {
+            var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+            if (target == null || !target.IsValid) return;
+
+            var cc = 0; //Add Requirements
+
+            var manaslider = Config.Item("harass.mana.slider").GetValue<Slider>().Value;
+
+            if (player.ManaPercent < manaslider) return;
+
+            if (Config.Item("harass.Q").GetValue<bool>() && Environment.TickCount - E.LastCastAttemptT > 800 && Environment.TickCount - R.LastCastAttemptT > 800)
+                SpellCast(target, Q.Range, Q, true, 1, false, HitChance.High);
+
+            if (Config.Item("harass.E").GetValue<bool>() && Environment.TickCount - Q.LastCastAttemptT > 800 && Environment.TickCount - R.LastCastAttemptT > 800)
+                SpellCast(target, E.Range, E, false, 1, true, HitChance.Medium);
+
         }
         public static void Routine()
         {

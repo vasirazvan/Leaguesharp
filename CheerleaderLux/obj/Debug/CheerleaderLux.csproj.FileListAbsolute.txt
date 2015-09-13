@@ -10,3 +10,8 @@ C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\LeagueSha
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.csprojResolveAssemblyReference.cache
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.exe
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.pdb
+C:\Users\Dominic\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.exe.config
+C:\Users\Dominic\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.exe
+C:\Users\Dominic\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.pdb
+C:\Users\Dominic\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.exe
+C:\Users\Dominic\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.pdb
