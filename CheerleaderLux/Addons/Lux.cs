@@ -36,18 +36,15 @@ namespace CheerleaderLux.Addons
             #region Menu
 
             Config = new Menu("Cheerleader Lux", "Lux", true).SetFontStyle(System.Drawing.FontStyle.Bold, Color.LightGreen);
-
             Orbwalker = new Orbwalking.Orbwalker(Config.AddSubMenu(new Menu("Orbwalker Settings", "Orbwalker Settings")));
-
             var combo = Config.AddSubMenu(new Menu("Combat Settings", "Combat Settings"));
             var killsteal = Config.AddSubMenu(new Menu("Killsteal Settings", "Killsteal Settings"));
-
             TargetSelector.AddToMenu(Config.AddSubMenu(new Menu("Target Selector", "Target Selector")));
             SPrediction.Prediction.Initialize(Config);
-
             var misc = Config.AddSubMenu(new Menu("Misc Settings", "Misc Settings"));
             var drawing = Config.AddSubMenu(new Menu("Draw Settings", "Draw Settings"));
 
+            //Credits
             Config.AddItem(new MenuItem("blank1", "                          "));
             Config.AddItem(new MenuItem("blank3", "Made by ScienceARK").SetFontStyle(System.Drawing.FontStyle.Bold));
 
@@ -59,10 +56,27 @@ namespace CheerleaderLux.Addons
             combo.AddItem(new MenuItem("combo.W", "Use W").SetValue(true));
             combo.AddItem(new MenuItem("combo.E", "Use E").SetValue(true));
             combo.AddItem(new MenuItem("combo.R", "Use R").SetValue(true));
+
+            //Harras Menu
             var Harass = combo.AddSubMenu(new Menu("Harass Settings", "harras").SetFontStyle(System.Drawing.FontStyle.Bold));
+
+            //AutoSpells
             var autospells = combo.AddSubMenu(new Menu("Auto Spell Settings", "ASS").SetFontStyle(System.Drawing.FontStyle.Bold));
             autospells.AddItem(new MenuItem("autospells.E.aoe", "Use [E] on X amount of Enemies").SetValue(true));
             autospells.AddItem(new MenuItem("autospells.E.aoe.count", "Enemy Count").SetValue(new Slider(3, 5, 1)));
+
+            //Drawings
+            var dmgdraw = drawing.AddSubMenu(new Menu("Damage Indicator Settings", "DMGI"));
+
+            var miscdraw = drawing.AddSubMenu(new Menu("Misc Drawings", "MiscD"));
+            miscdraw.AddItem(new MenuItem("draw.LuxE.position", "Draw Lux [E] Position").SetValue(true));
+            miscdraw.AddItem(new MenuItem("print.debug.chat", "Print Debug Messages").SetValue(true));
+
+            drawing.AddItem(new MenuItem("disable.draws", "Disable all Drawings").SetValue(false));
+            drawing.AddItem(new MenuItem("draw.Q", "Draw Q Range").SetValue(new Circle(true, System.Drawing.Color.Orange)));
+            drawing.AddItem(new MenuItem("draw.W", "Draw W Range").SetValue(new Circle(true, System.Drawing.Color.DarkOrange)));
+            drawing.AddItem(new MenuItem("draw.E", "Draw E Range").SetValue(new Circle(true, System.Drawing.Color.LightBlue)));
+            drawing.AddItem(new MenuItem("draw.R", "Draw R Range").SetValue(new Circle(true, System.Drawing.Color.CornflowerBlue)));
 
             Config.AddToMainMenu();
 
@@ -95,13 +109,27 @@ namespace CheerleaderLux.Addons
                 return;
 
             if (spellname.Contains("LuxLightBinding"))
+            {
                 Q.LastCastAttemptT = Environment.TickCount;
+                Printchat("[Q] Casted Tickcount: " + Q.LastCastAttemptT);
+            }
 
             if (spellname.Contains("LuxPrismaticWave"))
+            {
                 W.LastCastAttemptT = Environment.TickCount;
+                Printchat("[W] Casted Tickcount: " + W.LastCastAttemptT);
+            }
 
             if (spellname.Contains("LuxLightstrikeToggle"))
+            {
                 E.LastCastAttemptT = Environment.TickCount;
+                Printchat("[E-Toggle] Casted Tickcount: " + E.LastCastAttemptT);
+            }
+            if (spellname.Contains("LuxMaliceCannon"))
+            {
+                R.LastCastAttemptT = Environment.TickCount;
+                Printchat("[R] Casted Tickcount: " + R.LastCastAttemptT);
+            }
 
             //if (spellname.Contains("LuxMaliceCannon"))
 
@@ -109,7 +137,10 @@ namespace CheerleaderLux.Addons
 
         private static void Drawings(EventArgs args)
         {
-            if (Lux_E != null)
+            if (Config.Item("disable.draws").GetValue<bool>())
+                return;
+
+            if (Lux_E != null && Config.Item("draw.LuxE.position").GetValue<bool>())
             {
                 var pos1 = Drawing.WorldToScreen(player.Position);
                 var pos2 = Drawing.WorldToScreen(Lux_E.Position);
@@ -117,6 +148,26 @@ namespace CheerleaderLux.Addons
                 Drawing.DrawLine(pos1, pos2, 1, System.Drawing.Color.LightBlue);
                 Drawing.DrawCircle(Lux_E.Position, 100, System.Drawing.Color.Gray);
             }
+
+            if (Config.Item("draw.Q").GetValue<Circle>().Active)
+                if (Q.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, Q.Range,
+                        Q.IsReady() ? Config.Item("draw.Q").GetValue<Circle>().Color : System.Drawing.Color.Red);
+
+            if (Config.Item("draw.W").GetValue<Circle>().Active)
+                if (W.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, W.Range,
+                        W.IsReady() ? Config.Item("draw.W").GetValue<Circle>().Color : System.Drawing.Color.Red);
+
+            if (Config.Item("draw.E").GetValue<Circle>().Active)
+                if (E.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, E.Range - 1,
+                        E.IsReady() ? Config.Item("draw.E").GetValue<Circle>().Color : System.Drawing.Color.Red);
+
+            if (Config.Item("draw.R").GetValue<Circle>().Active)
+                if (R.Level > 0)
+                    Render.Circle.DrawCircle(ObjectManager.Player.Position, R.Range - 2,
+                        R.IsReady() ? Config.Item("draw.R").GetValue<Circle>().Color : System.Drawing.Color.Red);
 
             Drawing.DrawCircle(player.Position, Player.BoundingRadius, System.Drawing.Color.Gray);
         }
@@ -158,8 +209,15 @@ namespace CheerleaderLux.Addons
                     break;
             }
         }
+        /// <summary>
+        /// Printchat is being used for debug purposes.
+        /// </summary>
+        /// <param name="message"></param>
         private static void Printchat(string message)
         {
+            if (!Config.Item("print.debug.chat").GetValue<bool>())
+                return;
+
             Game.PrintChat(
                 "<font color='#FFB90F'>[Console]:</font> <font color='#FFFFFF'>" + message + "</font>");
         }
@@ -223,7 +281,6 @@ namespace CheerleaderLux.Addons
             if (spellslot.IsReady() && target.IsValidTarget(range))
             {
                 spellslot.SPredictionCast(target, Hitchance, 0, count);
-                Printchat("Cast Attempt: " + spellslot + " - Type: Basic Spell Cast");
             }
 
             if (collision)
@@ -232,26 +289,26 @@ namespace CheerleaderLux.Addons
             }
             //Collision check using Common.Prediction
             var qcollision = Q.GetCollision(player.Position.To2D(), new List<Vector2> { target.Position.To2D() });
-            var minioncol = qcollision.Where(x => !(x is Obj_AI_Hero)).Count();
+            var minioncol = qcollision.Where(x => (x is Obj_AI_Hero) && x.IsEnemy).Count();
 
-            //Sprediction
+
+            //Sprediction - Collision Cast
             if (spellslot.IsReady() && target.IsValidTarget(range) && collision && minioncol <= 1)
             {
                 spellslot.SPredictionCast(target, Hitchance, 0, count);
-                Printchat("Cast Attempt: " + spellslot + " - Type: Collision Enabled");
             }
 
             //Insert E cast information
             if (Lux_E == null && spellslot.IsReady() && objectcheck && target.IsValidTarget(E.Range))
             {
                 spellslot.SPredictionCast(target, Hitchance, 0, count);
-                Printchat("Cast Attempt: " + spellslot + " - Type: Object Check Enabled");
             }
         }
         public static void Routine()
         {
             var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (target == null || !target.IsValid) return;
+
 
             float qdmg = Q.GetDamage(target);
             float edmg = E.GetDamage(target);
@@ -276,15 +333,15 @@ namespace CheerleaderLux.Addons
             if (thp < aa && target.IsValidTarget(AArange))
                 return;
 
-            if (Config.Item("combo.Q").GetValue<bool>() && Environment.TickCount - E.LastCastAttemptT > 800)
+            if (Config.Item("combo.Q").GetValue<bool>() && Environment.TickCount - E.LastCastAttemptT > 800 && Environment.TickCount - R.LastCastAttemptT > 800)
                 SpellCast(target, Q.Range, Q, true, 1, false, HitChance.High);
 
             if (rooted && thp < aa && target.IsValidTarget(AArange))
                 return;
 
             //Sprediction Cast [E]
-            if (Config.Item("combo.E").GetValue<bool>() && Environment.TickCount - Q.LastCastAttemptT > 800)
-                SpellCast(target, E.Range, E, false, 1, true, HitChance.High);
+            if (Config.Item("combo.E").GetValue<bool>() && Environment.TickCount - Q.LastCastAttemptT > 800 && Environment.TickCount - R.LastCastAttemptT > 800)
+                SpellCast(target, E.Range, E, false, 1, true, HitChance.Medium);
 
             if (Config.Item("combo.R").GetValue<bool>() && R.IsReady())
                 SpellCastR(target);
@@ -317,7 +374,7 @@ namespace CheerleaderLux.Addons
             double edmg = E.GetDamage(target);
             double rdmg = R.GetDamage(target);
             double aa = Player.GetAutoAttackDamage(target);
-            var insideE = Lux_E != null && target.Distance(Lux_E.Position) <= E.Width;
+            var insideE = Lux_E != null && target.Distance(Lux_E.Position) < E.Width;
             var thp = target.Health;
             var AArange = Orbwalking.GetRealAutoAttackRange(player);
 
@@ -330,9 +387,12 @@ namespace CheerleaderLux.Addons
             if (insideE)
                 rdmg += edmg;
 
+            var qcollision = Q.GetCollision(player.Position.To2D(), new List<Vector2> { target.Position.To2D() });
+            var minioncol = qcollision.Where(x => (x is Obj_AI_Hero) && x.IsEnemy).Count();
+
             var rooted = target.HasBuff("LuxLightBindingMis");
 
-            if (Environment.TickCount - E.LastCastAttemptT < 800)
+            if (Environment.TickCount - E.LastCastAttemptT < 800 || Environment.TickCount - Q.LastCastAttemptT < 800)
                 return;
 
             //Checks if Allies can kill the bitch
@@ -342,14 +402,16 @@ namespace CheerleaderLux.Addons
             if (AllyCheck(target, 800) >= 1 && target.Health < rdmg / 2)
                 return;
             // = 
+
             if (E.IsReady() && thp < edmg && target.IsValidTarget(E.Range))
                 return;
 
-            if (Q.IsReady() && thp < qdmg && target.IsValidTarget(Q.Range))
+            if (Q.IsReady() && thp < qdmg && target.IsValidTarget(Q.Range) && minioncol <= 1)
                 return;
 
             if (insideE && thp < edmg)
                 return;
+
             if (insideE && thp < edmg + aa && target.IsValidTarget(AArange))
                 return;
 
@@ -359,7 +421,7 @@ namespace CheerleaderLux.Addons
             if (thp < edmg && E.IsReady() && rooted && target.IsValidTarget(E.Range))
                 return;
 
-            if (Q.IsReady() && !E.IsReady() && thp < qdmg && target.IsValidTarget(Q.Range))
+            if (Q.IsReady() && !E.IsReady() && thp < qdmg && target.IsValidTarget(Q.Range) && minioncol <= 1)
                 return;
 
             if (E.IsReady() && !Q.IsReady() && thp < edmg && target.IsValidTarget(E.Range))
@@ -367,6 +429,11 @@ namespace CheerleaderLux.Addons
 
             if (rooted && debuff && thp < aa && target.IsValidTarget(AArange))
                 return;
+
+            if (rooted && insideE && thp < rdmg + edmg && target.IsValidTarget(R.Range))
+            {
+                SpellCast(target, R.Range, R, false, 1, false, HitChance.High);
+            }
 
             if (rooted && debuff && thp < rdmg + aa && target.IsValidTarget(AArange))
             {

@@ -49,10 +49,6 @@
     <Reference Include="SharpDX">
       <HintPath>C:\Users\DJKle\Desktop\eFramework\LoL\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SPrediction, Version=1.0.0.4, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\DJKle\Desktop\eFramework\LoL\LeagueSharp\System\SPrediction.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -66,11 +62,22 @@
   <ItemGroup>
     <Compile Include="Addons\Extensions\Statics.cs" />
     <Compile Include="Addons\Lux.cs" />
+    <Compile Include="Addons\SPrediction\ClipperWrapper.cs" />
+    <Compile Include="Addons\SPrediction\Collision.cs" />
+    <Compile Include="Addons\SPrediction\Geometry.cs" />
+    <Compile Include="Addons\SPrediction\Prediction.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Addons\SPrediction\App.config" />
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Addons\SPrediction\Spacebar Prediction.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Addons\SPrediction\Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
