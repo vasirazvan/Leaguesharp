@@ -245,14 +245,14 @@ namespace CheerleaderLux.Addons
             var debuff = target.HasBuff("luxilluminatingfraulein");
 
             //Lux E detonation (Object Bounding Radius)
-            if (rooted && target.Distance(player.Position) <=
+            if (Lux_E != null && rooted && target.Distance(player.Position) <=
                 Orbwalking.GetRealAutoAttackRange(player) && target.Health > E.GetDamage(target) && debuff)
             {
                 Printchat("[E] Detonation Blocked. Reason: AA-able");
                 return;
             }
 
-            if (rooted && target.Distance(player.Position) <=
+            if (Lux_E != null && rooted && target.Distance(player.Position) <=
                 Orbwalking.GetRealAutoAttackRange(player) + 300 && target.Health > E.GetDamage(target) && debuff && target.CountEnemiesInRange(600) <= 1)
             {
                 Printchat("[E] Detonation Blocked. Reason: AA-able");
