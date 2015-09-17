@@ -46,7 +46,7 @@ namespace CheerleaderLux.Addons
 
             //Credits
             Config.AddItem(new MenuItem("blank1", "                          "));
-            Config.AddItem(new MenuItem("blank3", "Made by ScienceARK").SetFontStyle(System.Drawing.FontStyle.Bold));
+            Config.AddItem(new MenuItem("blank3", "Made by ScienceARK").SetFontStyle(System.Drawing.FontStyle.Bold, SharpDX.Color.Blue));
 
             //Combo Menu
             var Rsettings = combo.AddSubMenu(new Menu("Advanced [R] Settings", "advR").SetFontStyle(System.Drawing.FontStyle.Bold));
@@ -99,11 +99,30 @@ namespace CheerleaderLux.Addons
             Game.OnUpdate += OrbwalkerModes;
             Game.OnUpdate += RefreshObjects;
             Game.OnUpdate += AutoSpells;
+            Obj_AI_Base.OnProcessSpellCast += Wlogic;
             Orbwalking.BeforeAttack += SupportMode;
             GameObject.OnCreate += EisGone;
             GameObject.OnCreate += EisAlive;
             Obj_AI_Base.OnProcessSpellCast += Tickcount;
             Drawing.OnDraw += Drawings;
+
+
+        }
+
+        private static void Wlogic(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsEnemy && sender == null || sender.IsMinion) return;
+
+            var ally = HeroManager.Allies.Where(a => a.IsValidTarget(W.Range));
+            foreach (var AllyHero in ally)
+            {
+                if (AllyHero == null) return;
+
+                if (args.SData.Name.ToLower().Contains("attack") && args.Target.IsAlly)
+                    W.Cast(AllyHero);
+            }
+            if (args.SData.Name.ToLower().Contains("attack") && args.Target.IsMe)
+                W.Cast(Game.CursorPos);
         }
 
         private static void SupportMode(Orbwalking.BeforeAttackEventArgs args)
@@ -263,6 +282,10 @@ namespace CheerleaderLux.Addons
         }
         private static void RefreshObjects(EventArgs args)
         {
+
+            //Killsteal Refresh
+            KillstealMethod();
+
             var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (target == null) return;
 
@@ -278,7 +301,7 @@ namespace CheerleaderLux.Addons
                     E.Cast();
             }
 
-            if (Config.Item("combo.E.wait").GetValue<bool>() && minioncol <= 1)
+            if (Config.Item("combo.E.wait").GetValue<bool>() && minioncol <= 1 && target.Health > E.GetDamage(target));
                 return;
 
 
@@ -415,6 +438,7 @@ namespace CheerleaderLux.Addons
 
             foreach (var enemy in enemies)
             {
+                if (enemy == null) return;
                 #region -- Variables/Floats etc.
                 var ehp = enemy.Health;
                 float qdmg = Q.GetDamage(enemy);
@@ -432,12 +456,86 @@ namespace CheerleaderLux.Addons
                 if (insideE)
                     rdmg += edmg;
                 var rooted = enemy.HasBuff("LuxLightBindingMis");
+
+                var qcollision = Q.GetCollision(player.Position.To2D(), new List<Vector2> { enemy.Position.To2D() });
+                var minioncol = qcollision.Where(x => (x is Obj_AI_Hero) && x.IsEnemy).Count();
                 #endregion
 
                 if (ehp < edmg && Environment.TickCount - Q.LastCastAttemptT > 800 && E.IsReady() && Environment.TickCount - R.LastCastAttemptT > 800)
                     SpellCast(enemy, E.Range, E, false, 1, true, HitChance.High);
 
-                        }
+                if (insideE && ehp < edmg)
+                    return;
+
+                if (ehp < qdmg && Environment.TickCount - E.LastCastAttemptT > 800
+                    && Environment.TickCount - R.LastCastAttemptT > 800 && E.IsReady() && Q.IsReady())
+                    SpellCast(enemy, Q.Range, E, false, 1, true, HitChance.High);
+
+                #region ---------- Overkill checks
+                if (Environment.TickCount - E.LastCastAttemptT < 800 || Environment.TickCount - Q.LastCastAttemptT < 800)
+                    return;
+
+                //Checks if Allies can kill the bitch
+                if (AllyCheck(enemy, 600) >= 2 && enemy.Health < rdmg / 2)
+                    return;
+                //Checks if an Ally can kill le bitch
+                if (AllyCheck(enemy, 600) >= 1 && enemy.Health < rdmg / 2)
+                    return;
+                // = 
+
+                if (rooted && insideE && rdmg > thp && enemy.IsValidTarget(R.Range))
+                    SpellCast(enemy, R.Range, R, false, 1, false, HitChance.Medium);
+
+                if (E.IsReady() && thp < edmg && enemy.IsValidTarget(E.Range))
+                    return;
+
+                if (Q.IsReady() && thp < qdmg && enemy.IsValidTarget(Q.Range) && minioncol <= 1)
+                    return;
+
+                if (insideE && thp < edmg)
+                    return;
+
+                if (insideE && thp < edmg + aa && enemy.IsValidTarget(AArange))
+                    return;
+
+                if (thp < aa && enemy.IsValidTarget(AArange))
+                    return;
+
+                if (thp < edmg && E.IsReady() && rooted && enemy.IsValidTarget(E.Range))
+                    return;
+
+                if (Q.IsReady() && !E.IsReady() && thp < qdmg && enemy.IsValidTarget(Q.Range) && minioncol <= 1)
+                    return;
+
+                if (E.IsReady() && !Q.IsReady() && thp < edmg && enemy.IsValidTarget(E.Range))
+                    return;
+
+                if (rooted && debuff && thp < aa && enemy.IsValidTarget(AArange))
+                    return;
+
+                if (rooted && insideE && thp < rdmg + edmg && enemy.IsValidTarget(R.Range))
+                {
+                    SpellCast(enemy, R.Range, R, false, 1, false, HitChance.Medium);
+                }
+
+                if (rooted && debuff && thp < rdmg + aa && enemy.IsValidTarget(AArange))
+                {
+                    SpellCast(enemy, R.Range, R, false, 1, false, HitChance.Medium);
+                }
+
+                if (rooted && debuff && thp < rdmg && enemy.IsValidTarget(R.Range))
+                {
+                    SpellCast(enemy, R.Range, R, false, 1, false, HitChance.Medium);
+                }
+
+                if (thp < rdmg)
+                {
+                    SpellCast(enemy, R.Range, R, false, 1, false, HitChance.Medium);
+                }
+                #endregion ------------ Overkill Checks
+
+            }
+
         }
         public static void Routine()
         {
