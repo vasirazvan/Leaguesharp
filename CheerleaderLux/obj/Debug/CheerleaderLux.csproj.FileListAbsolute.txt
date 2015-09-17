@@ -7,6 +7,10 @@ C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\LeagueSha
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\SharpDX.dll
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\SharpDX.Direct3D9.dll
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\bin\Release\LeagueSharp.Sandbox.dll
-C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.csprojResolveAssemblyReference.cache
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.exe
 C:\Users\DJKle\Documents\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.pdb
+C:\Users\Dominic\Downloads\documents-export-2015-09-17\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.exe.config
+C:\Users\Dominic\Downloads\documents-export-2015-09-17\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.exe
+C:\Users\Dominic\Downloads\documents-export-2015-09-17\GitHub\Leaguesharp\CheerleaderLux\obj\Debug\CheerleaderLux.pdb
+C:\Users\Dominic\Downloads\documents-export-2015-09-17\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.exe
+C:\Users\Dominic\Downloads\documents-export-2015-09-17\GitHub\Leaguesharp\CheerleaderLux\bin\Release\CheerleaderLux.pdb
