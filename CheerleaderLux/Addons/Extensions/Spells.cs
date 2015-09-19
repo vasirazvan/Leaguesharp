@@ -67,7 +67,7 @@ namespace CheerleaderLux.Addons.Extensions
                         {
                             List<Obj_AI_Base> list = Collisions.GetCollision(from, pos, spell);
 
-                            if (list.Count == 0 || spell == Lux.Q && list.Count >= 1)
+                            if (list.Count == 0 || spell == Lux.Q && list.Count <= 1)
                             {
                                 Vector3 pos1 = Predictions.GetPrediction(from, ToTarget, spell);
                                 return Player.Spellbook.CastSpell(spell.spellslot, pos1);
@@ -109,7 +109,7 @@ namespace CheerleaderLux.Addons.Extensions
                         {
                             List<Obj_AI_Base> list = Collisions.GetCollision(from, pos, spell);
 
-                            if (list.Count == 0)
+                            if (list.Count == 0 || spell == Lux.Q && list.Count <= 1)
                             {
                                 Vector3 pos1 = Predictions.GetPrediction(from, ToTarget, spell);
                                 return Player.Spellbook.CastSpell(spell.spellslot, pos1);
@@ -150,7 +150,7 @@ namespace CheerleaderLux.Addons.Extensions
                         else
                         {
                             List<Obj_AI_Base> list = Collisions.GetCollision(from, pos, spell);
-                            if (list.Count == 0)
+                            if (list.Count == 0 || spell == Lux.Q && list.Count <= 1)
                             {
                                 Vector3 pos1 = Predictions.GetPrediction(from, ToTarget, spell);
                                 return Player.Spellbook.CastSpell(spell.spellslot, from, pos1);

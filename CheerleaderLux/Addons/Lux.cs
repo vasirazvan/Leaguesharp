@@ -29,8 +29,8 @@ namespace CheerleaderLux.Addons
             E1.SetSkillshot(0.25f, 275f, 1100f, false, SkillshotType.SkillshotCircle);
             R1.SetSkillshot(1f, 190f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
-            Q = new Extensions.Spells(SpellSlot.Q, SkillshotType.SkillshotLine, 1300, 0.25f, 70, false, 1200f);
-            E = new Extensions.Spells(SpellSlot.E, SkillshotType.SkillshotCircle, 1100, 0.25f, 275, false, 1300f);
+            Q = new Extensions.Spells(SpellSlot.Q, SkillshotType.SkillshotLine, 1300, 0.25f, 70, true, 1100f);
+            E = new Extensions.Spells(SpellSlot.E, SkillshotType.SkillshotCircle, 1300, 0.25f, 275, false, 1300f);
             W = new Extensions.Spells(SpellSlot.W, SkillshotType.SkillshotLine, 1075, 0.25f, 70, false, 1200f);
             R = new Extensions.Spells(SpellSlot.R, SkillshotType.SkillshotLine, 3300, 1f, 190, false, float.MaxValue);
 
@@ -52,7 +52,7 @@ namespace CheerleaderLux.Addons
             Config.AddItem(new MenuItem("blank1", "                          "));
 
 
-            Config.AddItem(new MenuItem("blank3", "Made by ScienceARK").SetFontStyle(System.Drawing.FontStyle.Regular, Color.HotPink));
+            Config.AddItem(new MenuItem("blank3", "Made by ScienceARK").SetFontStyle(System.Drawing.FontStyle.Bold));
 
             //Combo Menu
             var Rsettings = combo.AddSubMenu(new Menu("Advanced [R] Settings", "advR").SetFontStyle(System.Drawing.FontStyle.Bold));
@@ -126,6 +126,8 @@ namespace CheerleaderLux.Addons
                     new StringList(new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 3)));
             prediction.AddItem(new MenuItem("prediction.R", "[R] Hitchance").SetValue(
                     new StringList(new[] { HitChance.Low.ToString(), HitChance.Medium.ToString(), HitChance.High.ToString(), HitChance.VeryHigh.ToString() }, 3)));
+            prediction.AddItem(new MenuItem("ayy", "Modified LeagueSharp.Common Prediction"));
+            prediction.AddItem(new MenuItem("ayy2", "Credits: Badao"));
 
             Config.AddToMainMenu();
 
@@ -427,12 +429,12 @@ namespace CheerleaderLux.Addons
                 Q1.SetSkillshot(0.25f, 200f, 1200f, false, SkillshotType.SkillshotLine);
             }
             //Collision check using Common.Prediction
-            var qcollision = Q1.GetCollision(player.Position.To2D(), new List<Vector2> { Q1.GetPrediction(target).CastPosition.To2D() });
-            var minioncol = qcollision.Where(x => (x is Obj_AI_Hero) && x.IsEnemy).Count();
+            //var qcollision = Q1.GetCollision(player.Position.To2D(), new List<Vector2> { Q1.GetPrediction(target).CastPosition.To2D() });
+            //var minioncol = qcollision.Where(x => (x is Obj_AI_Hero) && x.IsEnemy).Count();
 
 
             //Sprediction - Collision Cast
-            if (spell.IsReady() && target.IsValidTarget(range) && collision && minioncol <= 1 && CastPosition.Hitchance >= Hitchance)
+            if (spell.IsReady() && target.IsValidTarget(range) && collision && CastPosition.Hitchance >= Hitchance)
             {
                 Extensions.CastSpell.Cast(spellslot, target);
             }
