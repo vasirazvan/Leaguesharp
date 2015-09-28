@@ -117,9 +117,9 @@ namespace PewPewTristana
 
             //JUNGLEFARMMENU
             Config.SubMenu("[PPT]: Jungle Settings")
-                .AddItem(new MenuItem("jungleQ", "Use Q").SetValue(false));
+                .AddItem(new MenuItem("jungleQ", "Use Q").SetValue(true));
             Config.SubMenu("[PPT]: Jungle Settings")
-                .AddItem(new MenuItem("jungleE", "Use E").SetValue(false));
+                .AddItem(new MenuItem("jungleE", "Use E").SetValue(true));
             Config.SubMenu("[PPT]: Jungle Settings")
                 .AddItem(new MenuItem("jungleclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
