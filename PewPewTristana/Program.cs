@@ -107,19 +107,19 @@ namespace PewPewTristana
 
             //LANECLEARMENU
             Config.SubMenu("[PPT]: Laneclear Settings")
-                .AddItem(new MenuItem("laneQ", "Use Q").SetValue(true));
+                .AddItem(new MenuItem("laneQ", "Use Q").SetValue(false));
             Config.SubMenu("[PPT]: Laneclear Settings")
-                .AddItem(new MenuItem("laneE", "Use E").SetValue(true));
+                .AddItem(new MenuItem("laneE", "Use E").SetValue(false));
             Config.SubMenu("[PPT]: Laneclear Settings")
-                .AddItem(new MenuItem("eturret", "Use E on turrets").SetValue(true));
+                .AddItem(new MenuItem("eturret", "Use E on turrets").SetValue(false));
             Config.SubMenu("[PPT]: Laneclear Settings")
                 .AddItem(new MenuItem("laneclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
             //JUNGLEFARMMENU
             Config.SubMenu("[PPT]: Jungle Settings")
-                .AddItem(new MenuItem("jungleQ", "Use Q").SetValue(true));
+                .AddItem(new MenuItem("jungleQ", "Use Q").SetValue(false));
             Config.SubMenu("[PPT]: Jungle Settings")
-                .AddItem(new MenuItem("jungleE", "Use E").SetValue(true));
+                .AddItem(new MenuItem("jungleE", "Use E").SetValue(false));
             Config.SubMenu("[PPT]: Jungle Settings")
                 .AddItem(new MenuItem("jungleclearmana", "Mana Percentage").SetValue(new Slider(30, 100, 0)));
 
